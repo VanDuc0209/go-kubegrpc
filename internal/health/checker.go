@@ -82,36 +82,58 @@ func (c *DefaultChecker) runWatch(ctx context.Context, conn *grpc.ClientConn, ch
 	client := healthpb.NewHealthClient(conn)
 	req := &healthpb.HealthCheckRequest{Service: c.cfg.ServiceName}
 
-	stream, err := client.Watch(ctx, req)
-	if err != nil {
-		if isUnimplemented(err) {
-			// R6.8: Watch not supported — fall back to periodic Check.
-			c.runPeriodicCheck(ctx, client, ch)
-			return
-		}
-		// Transient dial error before stream was established; treat as not serving.
-		sendState(ctx, ch, HealthNotServing)
-		return
-	}
-
+	backoff := 1 * time.Second
 	for {
-		resp, err := stream.Recv()
+		stream, err := client.Watch(ctx, req)
 		if err != nil {
-			if ctx.Err() != nil {
-				// Context canceled — normal shutdown.
-				return
-			}
 			if isUnimplemented(err) {
-				// R6.8: server stopped supporting Watch mid-stream; fall back.
+				// R6.8: Watch not supported — fall back to periodic Check.
 				c.runPeriodicCheck(ctx, client, ch)
 				return
 			}
-			// Other stream error; report not serving and let the caller decide.
-			sendState(ctx, ch, HealthNotServing)
-			return
+			// Transient dial error before stream was established; treat as not serving.
+			if !sendState(ctx, ch, HealthNotServing) {
+				return
+			}
+			// Wait before retrying
+			select {
+			case <-ctx.Done():
+				return
+			case <-time.After(backoff):
+				backoff *= 2
+				if backoff > 10*time.Second {
+					backoff = 10 * time.Second
+				}
+			}
+			continue
 		}
 
-		sendState(ctx, ch, toHealthState(resp.Status))
+		// Reset backoff on successful watch establishment
+		backoff = 1 * time.Second
+
+		for {
+			resp, err := stream.Recv()
+			if err != nil {
+				if ctx.Err() != nil {
+					// Context canceled — normal shutdown.
+					return
+				}
+				if isUnimplemented(err) {
+					// R6.8: server stopped supporting Watch mid-stream; fall back.
+					c.runPeriodicCheck(ctx, client, ch)
+					return
+				}
+				// Other stream error; report not serving and break to retry Watch.
+				if !sendState(ctx, ch, HealthNotServing) {
+					return
+				}
+				break
+			}
+
+			if !sendState(ctx, ch, toHealthState(resp.Status)) {
+				return
+			}
+		}
 	}
 }
 

@@ -305,6 +305,8 @@ func (b *k8sBalancer) UpdateSubConnState(sc grpcbalancer.SubConn, state grpcbala
 			b.stopHealthCheck(entry)
 		}
 		b.pool.UpdateHealth(key, HealthNotServing)
+	case connectivity.Idle:
+		sc.Connect()
 	default:
 		// Idle / Connecting: leave health state unchanged until resolved.
 	}

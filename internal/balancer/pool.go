@@ -156,6 +156,7 @@ func (p *Pool) Add(namespace, service string, ep resolver.Endpoint) (*SubConnEnt
 		CreatedAt: time.Now(),
 	}
 	p.entries[key] = entry
+	sc.Connect()
 
 	// R4.7: emit INFO log on SubConn creation.
 	p.logger.Info("subconn created",
