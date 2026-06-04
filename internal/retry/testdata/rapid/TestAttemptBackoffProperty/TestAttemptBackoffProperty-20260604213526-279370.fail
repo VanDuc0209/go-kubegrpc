@@ -1,0 +1,23 @@
+# 2026/06/04 21:35:26.408635 [TestAttemptBackoffProperty] [rapid] draw initialMs: 11
+# 2026/06/04 21:35:26.408657 [TestAttemptBackoffProperty] [rapid] draw multiplier: 1
+# 2026/06/04 21:35:26.408670 [TestAttemptBackoffProperty] [rapid] draw maxMs: 10
+# 2026/06/04 21:35:26.408681 [TestAttemptBackoffProperty] [rapid] draw n: 1
+# 2026/06/04 21:35:26.408688 [TestAttemptBackoffProperty] sequence not monotone: AttemptBackoff(2)=10ms < AttemptBackoff(1)=11ms (initial=11ms max=10ms mult=1)
+# 
+v0.4.8#14452467766042978427
+0x0
+0x943dab5850d10
+0xa
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0

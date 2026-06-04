@@ -1,0 +1,21 @@
+# 2026/06/04 21:36:13.582742 [TestCapEndpointsHonorsCap] [rapid] draw endpoints: []resolver.Endpoint{resolver.Endpoint{Address:"10.0.0.1", Port:8081, Ready:true}, resolver.Endpoint{Address:"10.0.0.1", Port:8080, Ready:true}}
+# 2026/06/04 21:36:13.582803 [TestCapEndpointsHonorsCap] [rapid] draw max_subconns: 2
+# 2026/06/04 21:36:13.582829 [TestCapEndpointsHonorsCap] result[0]={10.0.0.1 8081 true} but expected lex-smallest[0]={10.0.0.1 8080 true}
+# result=[{10.0.0.1 8081 true} {10.0.0.1 8080 true}]
+# expected=[{10.0.0.1 8080 true} {10.0.0.1 8081 true}]
+# 
+v0.4.8#7903793072044061684
+0x5555555555555
+0x0
+0x0
+0x0
+0x1
+0x5555555555555
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x0
+0x1
